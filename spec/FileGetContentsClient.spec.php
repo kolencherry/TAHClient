@@ -6,7 +6,6 @@ use TAHClient\FileGetContentsClient;
 describe('FileGetContentsClient', function(){
     beforeAll(function(){
         $this->client=new FileGetContentsClient();
-        $this->prefix='https://httpbin.org/';
     });
 
     describe('::buildOptionsArray', function(){
@@ -63,6 +62,18 @@ describe('FileGetContentsClient', function(){
             $res=$this->client->buildOptionsArray('PUT', $data);
             expect($res['content'])->toEqual('To=client%3Apatrick&From=%2B15128675309');
         });
+
+        it('should ignore the data param for DELETE requests', function(){
+            // PHP preserves order as declared for Arrays
+            $data=array(
+                'To'=>'client:patrick',
+                'From'=>'+15128675309'
+            );
+
+            $res=$this->client->buildOptionsArray('DELETE', $data);
+            expect(array_key_exists('content', $res))->toBeFalsy();
+        });
+
     });
 
     describe('::buildQueryString', function(){
@@ -98,12 +109,58 @@ describe('FileGetContentsClient', function(){
 
     // ToDo: expand tests to cover more request types
     describe('::request', function(){
-        it('should return a Response object', function(){
-
+        beforeAll(function(){
+            $this->prefix='https://httpbin.org';
+            $this->params=array(
+                'to'=>'client:patrick',
+                'from'=>'+15124313364'
+            );
         });
 
-        it('should make a GET request', function(){
+        it('should return a Twilio HTTP Response object', function(){
+            $url=$this->prefix.'/get';
+            expect($this->client->request('GET', $url))
+                ->toBeAnInstanceOf('Twilio\Http\Response');
+        });
 
+        it('should successfully make a GET request', function(){
+            $url=$this->prefix.'/get';
+            $res=$this->client->request('GET', $url, $this->params);
+
+            // httpbin will only return a 200 for a successful GET to /get
+            expect($res->getStatusCode())->toEqual(200);
+            expect($res->getHeaders())->toBeA('array');
+            expect($res->getContent()['args'])->toContainKeys(array_keys($this->params));
+        });
+
+        it('should successfully make a POST request', function(){
+            $url=$this->prefix.'/post';
+            $res=$this->client->request('POST', $url, array(), $this->params);
+
+            // httpbin will only return a 200 for a successful GET to /get
+            expect($res->getStatusCode())->toEqual(200);
+            expect($res->getHeaders())->toBeA('array');
+            expect($res->getContent()['args'])->toContainKeys(array_keys($this->params));
+        });
+
+        it('should successfully make a PUT request', function(){
+            $url=$this->prefix.'/put';
+            $res=$this->client->request('PUT', $url, array(), $this->params);
+
+            // httpbin will only return a 200 for a successful GET to /get
+            expect($res->getStatusCode())->toEqual(200);
+            expect($res->getHeaders())->toBeA('array');
+            expect($res->getContent()['args'])->toContainKeys(array_keys($this->params));
+        });
+
+        it('should successfully make a DELETE request', function(){
+            $url=$this->prefix.'/delete';
+            $res=$this->client->request('DELETE', $url, array(), $this->params);
+
+            // httpbin will only return a 200 for a successful GET to /get
+            expect($res->getStatusCode())->toEqual(200);
+            expect($res->getHeaders())->toBeA('array');
+            expect($res->getContent()['args'])->toEqual(array());
         });
     });
 })
