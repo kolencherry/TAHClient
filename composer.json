@@ -1,5 +1,5 @@
 {
-    "name": "kolencherry/fgc-client",
+    "name": "kolencherry/tah-client",
     "description": "Reference Implementation of Twilio\\Http\\Client for environments where cURL is not supported",
     "type": "library",
     "require": {
