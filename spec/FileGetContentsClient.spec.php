@@ -14,22 +14,22 @@ describe('FileGetContentsClient', function(){
                 'X-Patrick-Header' => 'Kolencherry',
                 'X-Forwarded-By' => '1.2.3.4'
             );
-            $res=$this->client->buildOptionsArray(null, array(), $headers);
-            expect($res['headers'])->toContain('X-Patrick-Header: Kolencherry', 
+            $res=$this->client->buildOptionsArray('POST', array(), $headers);
+            expect($res['header'])->toContain('X-Patrick-Header: Kolencherry', 
                 'X-Forwarded-By: 1.2.3.4');
         });
 
         it('should correctly generate a basic Auth header', function(){
-            $res=$this->client->buildOptionsArray(null, array(), array(), 
+            $res=$this->client->buildOptionsArray(NULL, array(), array(), 
                 'patrick', 'kolencherry');
 
-            expect($res['headers'])->toContain(
+            expect($res['header'])->toContain(
                 'Authorization: Basic cGF0cmljazprb2xlbmNoZXJyeQ==');
         });
 
         it('should correctly override the default HTTP timeout', function(){
-            $res=$this->client->buildOptionsArray(null, array(), array(),
-                null, null, 120);
+            $res=$this->client->buildOptionsArray(NULL, array(), array(),
+                NULL, NULL, 120);
 
             expect($res['timeout'])->toEqual(120);
         });
@@ -84,7 +84,7 @@ describe('FileGetContentsClient', function(){
         it('should return a Falsy value for an non-array', function(){
             expect($this->client->buildQueryString(123))->toBeFalsy();
             expect($this->client->buildQueryString('abd'))->toBeFalsy();
-            expect($this->client->buildQueryString(true))->toBeFalsy();
+            expect($this->client->buildQueryString(TRUE))->toBeFalsy();
         });
 
         it('should return a urlencoded query string for unsafe characters', function(){
@@ -107,7 +107,6 @@ describe('FileGetContentsClient', function(){
         });
     });
 
-    // ToDo: expand tests to cover more request types
     describe('::request', function(){
         beforeAll(function(){
             $this->prefix='https://httpbin.org';
@@ -123,11 +122,16 @@ describe('FileGetContentsClient', function(){
                 ->toBeAnInstanceOf('Twilio\Http\Response');
         });
 
+        it('should accept null parameters for params, data, and headers', function(){
+            $url=$this->prefix.'/get';
+            expect($this->client->request('GET', $url, NULL, NULL, NULL))
+                ->toBeAnInstanceOf('Twilio\Http\Response');
+        });
+
         it('should successfully make a GET request', function(){
             $url=$this->prefix.'/get';
             $res=$this->client->request('GET', $url, $this->params);
 
-            // httpbin will only return a 200 for a successful GET to /get
             expect($res->getStatusCode())->toEqual(200);
             expect($res->getHeaders())->toBeA('array');
             expect($res->getContent()['args'])->toContainKeys(array_keys($this->params));
@@ -135,32 +139,39 @@ describe('FileGetContentsClient', function(){
 
         it('should successfully make a POST request', function(){
             $url=$this->prefix.'/post';
-            $res=$this->client->request('POST', $url, array(), $this->params);
+            $res=$this->client->request('POST', $url, NULL, $this->params, array(
+                'Content-Type'=>'application/x-www-form-urlencoded',
+                'X-Patrick-Header'=>'Kolencherry'));
 
-            // httpbin will only return a 200 for a successful GET to /get
             expect($res->getStatusCode())->toEqual(200);
             expect($res->getHeaders())->toBeA('array');
-            expect($res->getContent()['args'])->toContainKeys(array_keys($this->params));
+            expect($res->getContent()['form'])->toContainKeys(array_keys($this->params));
         });
 
         it('should successfully make a PUT request', function(){
             $url=$this->prefix.'/put';
-            $res=$this->client->request('PUT', $url, array(), $this->params);
+            $res=$this->client->request('PUT', $url, NULL, $this->params, array(
+                'Content-Type'=>'application/x-www-form-urlencoded'));
 
-            // httpbin will only return a 200 for a successful GET to /get
             expect($res->getStatusCode())->toEqual(200);
             expect($res->getHeaders())->toBeA('array');
-            expect($res->getContent()['args'])->toContainKeys(array_keys($this->params));
+            expect($res->getContent()['form'])->toContainKeys(array_keys($this->params));
         });
 
         it('should successfully make a DELETE request', function(){
             $url=$this->prefix.'/delete';
-            $res=$this->client->request('DELETE', $url, array(), $this->params);
+            $res=$this->client->request('DELETE', $url, NULL, $this->params);
 
-            // httpbin will only return a 200 for a successful GET to /get
             expect($res->getStatusCode())->toEqual(200);
             expect($res->getHeaders())->toBeA('array');
             expect($res->getContent()['args'])->toEqual(array());
+        });
+
+        it('should successfully make a request with basic auth', function(){
+            $url=$this->prefix.'/basic-auth/patrick/123';
+            $res=$this->client->request('GET', $url, NULL, NULL, NULL, 'patrick', '123');
+
+            expect($res->getStatusCode())->toEqual(200);
         });
     });
 })
