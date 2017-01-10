@@ -6,7 +6,7 @@ use TAHClient\FileGetContentsClient;
 describe('FileGetContentsClient', function(){
     beforeAll(function(){
         $this->client=new FileGetContentsClient();
-        $this->prefix='https://httpbin.org/'
+        $this->prefix='https://httpbin.org/';
     });
 
     describe('::buildOptionsArray', function(){
@@ -15,13 +15,13 @@ describe('FileGetContentsClient', function(){
                 'X-Patrick-Header' => 'Kolencherry',
                 'X-Forwarded-By' => '1.2.3.4'
             );
-            $res=$this->client->buildOptionsArray(null, array(), array(), $headers);
+            $res=$this->client->buildOptionsArray(null, array(), $headers);
             expect($res['headers'])->toContain('X-Patrick-Header: Kolencherry', 
                 'X-Forwarded-By: 1.2.3.4');
         });
 
         it('should correctly generate a basic Auth header', function(){
-            $res=$this->client->buildOptionsArray(null, array(), array(), array(), 
+            $res=$this->client->buildOptionsArray(null, array(), array(), 
                 'patrick', 'kolencherry');
 
             expect($res['headers'])->toContain(
@@ -29,10 +29,39 @@ describe('FileGetContentsClient', function(){
         });
 
         it('should correctly override the default HTTP timeout', function(){
-            $res=$this->client->buildOptionsArray(null, array(), array(), array(),
+            $res=$this->client->buildOptionsArray(null, array(), array(),
                 null, null, 120);
 
             expect($res['timeout'])->toEqual(120);
+        });
+
+        it('should correctly set the method for a request', function(){
+            expect($this->client->buildOptionsArray('GET')['method'])->toEqual('GET');
+            expect($this->client->buildOptionsArray('PoSt')['method'])->toEqual('POST');
+            expect($this->client->buildOptionsArray('PUT  ')['method'])->toEqual('PUT');
+            expect($this->client->buildOptionsArray(' head ')['method'])->toEqual('HEAD');
+        });
+
+        it('should correctly set the encoded content for POST data', function(){
+            // PHP preserves order as declared for Arrays
+            $data=array(
+                'To'=>'client:patrick',
+                'From'=>'+15128675309'
+            );
+
+            $res=$this->client->buildOptionsArray('POST', $data);
+            expect($res['content'])->toEqual('To=client%3Apatrick&From=%2B15128675309');
+        });
+
+        it('should correctly set the encoded content for PUT data', function(){
+            // PHP preserves order as declared for Arrays
+            $data=array(
+                'To'=>'client:patrick',
+                'From'=>'+15128675309'
+            );
+
+            $res=$this->client->buildOptionsArray('PUT', $data);
+            expect($res['content'])->toEqual('To=client%3Apatrick&From=%2B15128675309');
         });
     });
 
@@ -70,8 +99,8 @@ describe('FileGetContentsClient', function(){
     // ToDo: expand tests to cover more request types
     describe('::request', function(){
         it('should return a Response object', function(){
-            
-        })
+
+        });
 
         it('should make a GET request', function(){
 

@@ -29,8 +29,8 @@ class FileGetContentsClient implements Client {
     **
     **  @return array Array of options that's consumable by file_get_contents
     */
-    public function buildOptionsArray($method, $params=array(), $data=array(), 
-        $headers=array(), $username=null, $password=null, $timeout=null){
+    public function buildOptionsArray($method, $data=array(), $headers=array(), 
+        $username=null, $password=null, $timeout=null){
 
         $options=array();
 
@@ -50,7 +50,9 @@ class FileGetContentsClient implements Client {
             $options['headers'][] = 'Authorization: Basic '
                 .base64_encode("$username:$password");
 
-        
+        // This has the potential to have implications for memory usage for big files
+        if($options['method']=='POST' || $options['method']=='PUT')
+            $options['content']=$this->buildQueryString($data);
 
         return $options;
     }
@@ -61,7 +63,6 @@ class FileGetContentsClient implements Client {
     **  @return string Query string with all fields appropriately encoded
     */
     public function buildQueryString($params){
-        // Funny enough, despite calling it queryParts, this will handle multipart
         $queryParts=array();
 
         // Takes care of the case of Truthy params as input to function
