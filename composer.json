@@ -1,0 +1,18 @@
+{
+    "name": "kolencherry/fgc-client",
+    "description": "Reference Implementation of Twilio\\Http\\Client for environments where cURL is not supported",
+    "type": "library",
+    "require": {
+        "twilio/sdk": "^5.4"
+    },
+    "require-dev": {
+        "kahlan/kahlan": "^3.1"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Patrick Kolencherry",
+            "email": "pkolencherry@twilio.com"
+        }
+    ]
+}
