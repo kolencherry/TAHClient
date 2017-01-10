@@ -174,4 +174,4 @@ describe('FileGetContentsClient', function(){
             expect($res->getStatusCode())->toEqual(200);
         });
     });
-})
+});
