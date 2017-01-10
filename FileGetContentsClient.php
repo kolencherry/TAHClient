@@ -82,7 +82,7 @@ class FileGetContentsClient implements Client {
     **  @param string $password (Optional) The password for a request with basic auth
     **  @param float $timeout (Optional) The HTTP timeout in seconds — defaults to 60s
     **
-    **  @return array Array of options that's consumable by file_get_contents
+    **  @return array Array of options that's consumable by stream_context_create
     */
     public function buildOptionsArray($method, $data=array(), $headers=array(), 
         $username=null, $password=null, $timeout=null){
@@ -140,5 +140,3 @@ class FileGetContentsClient implements Client {
         return implode('&', $queryParts);
     }
 }
-
-?>

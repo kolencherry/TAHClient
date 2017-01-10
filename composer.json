@@ -3,7 +3,8 @@
     "description": "Reference Implementation of Twilio\\Http\\Client for environments where cURL is not supported",
     "type": "library",
     "require": {
-        "twilio/sdk": "^5.4"
+        "twilio/sdk": "^5.4",
+        "php": ">=5.3.0"
     },
     "require-dev": {
         "kahlan/kahlan": "^3.1"
