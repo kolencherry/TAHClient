@@ -16,7 +16,7 @@ $client=new Client($accountSid, $authToken, NULL, NULL, new FileGetContentsClien
 
 $client->account->messages->create('+15128675309', array(
     'from'=>'+15005550006',
-    'body'=>'Hey Jenny, what's up?'));
+    'body'=>"Hey Jenny, what's up?"));
 ```
 
 ## Testing
