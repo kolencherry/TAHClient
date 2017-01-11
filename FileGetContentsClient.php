@@ -49,7 +49,7 @@ class FileGetContentsClient implements Client {
         $res=file_get_contents($url, FALSE, $context);
 
         if($res===FALSE)
-            throw new ErrorException('file_get_contents failed');
+            throw new \ErrorException('file_get_contents failed');
 
         // This is why I don't like file_get_contents — thankfully it's locally scoped
         $rawHeaders=$http_response_header;
@@ -92,6 +92,8 @@ class FileGetContentsClient implements Client {
         $options['header']=array();
         // PHP defaults to HTTP 1.0 for HTTP Contexts — Twilio uses 1.1 w/ CurlClient
         $options['protocol_version']=1.1;
+        // Passes on the HTTP error to the user, rather than throwing an Exception
+        $options['ignore_errors']=TRUE;
 
         $options['method']=strtoupper(trim($method));
         $options['timeout']=($timeout)?$timeout:self::DEFAULT_HTTP_TIMEOUT;
