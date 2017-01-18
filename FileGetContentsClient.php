@@ -56,8 +56,10 @@ class FileGetContentsClient implements Client {
         $headers=array();
 
         // The first entry of $http_response_header will always be the status code. This
-        // extracts the numerical status code from there.
-        $statusCode=explode(" ","$rawHeaders[0] ")[1];
+        // extracts the numerical status code from there. We have to store this in a temp
+        // variable because PHP 5.3.x doesnt support ()[] for array access.
+        $sc=explode(" ","$rawHeaders[0] ");
+        $statusCode=$sc[1];
         unset($rawHeaders[0]);
 
         // $http_response_header returns a numerical indexed array of headers broken out
