@@ -109,6 +109,11 @@ class FileGetContentsClient implements Client {
             $options['header'][] = 'Authorization: Basic '
                 .base64_encode("$username:$password");
 
+        // PHP 5.3 has an issue file_get_contents doesn't close the connection on its own,
+        // so we have send a Connection: close header to force the connection to close
+        if(version_compare(PHP_VERSION, '5.4.0', '<'))
+            $options['header'][]='Connection: close';
+
         // This has the potential to have implications for memory usage for big files
         if($options['method']=='POST' || $options['method']=='PUT')
             $options['content']=$this->buildQueryString($data);
